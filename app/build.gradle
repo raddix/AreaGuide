@@ -29,4 +29,5 @@ dependencies {
     implementation 'com.tomtom.online:sdk-routing:2.243'
     implementation 'com.tomtom.online:sdk-search:2.243'
     implementation 'com.tomtom.online:sdk-maps-ui-extensions:2.243'
+    api("com.tomtom.online:sdk-search:2.+@aar")
 }
