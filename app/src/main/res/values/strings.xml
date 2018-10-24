@@ -8,4 +8,13 @@
     <string name="poisearch_hint">Kind of place to add to your route</string>
     <string name="no_search_results">No search results for \'%1$s\'. Please try another search term.</string>
     <string name="add_to_my_route">Add to my route</string>
+    <string-array name="Categories">
+        <item>Shops</item>
+        <item>Museum</item>
+        <item>Resturants</item>
+        <item>Hospital</item>
+        <item>Brothel</item>
+        <item>Wakanda</item>
+        <item>Gspot</item>
+    </string-array>
 </resources>
