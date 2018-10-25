@@ -2,12 +2,14 @@ package com.censarone.areaguide;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -55,6 +57,7 @@ import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchResult;
 import com.tomtom.online.sdk.search.data.reversegeocoder.ReverseGeocoderSearchQueryBuilder;
 import com.tomtom.online.sdk.search.data.reversegeocoder.ReverseGeocoderSearchResponse;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -73,6 +76,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private LatLng wayPointPosition;
     private Icon departureIcon;
     private Icon destinationIcon;
+    private Button mOrder;
+    private TextView mSelectedItemss;
+    private String[] catValues;
+    private boolean[] checkedCat;
+    private ArrayList<Integer> userSelectCat=new ArrayList<>();
+
 
     protected LocationManager locationManager;
     protected LocationListener locationListener;
@@ -82,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private LatLng a;
     private LatLng b;
+
 
     protected String latitude, longitude;
 
@@ -111,6 +121,66 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         setupUIViewListeners();
 
         justChecking();
+        mOrder=(Button)findViewById(R.id.btbOrder);
+        mSelectedItemss=(TextView)findViewById(R.id.textView);
+        catValues=getResources().getStringArray(R.array.Categories);
+        checkedCat=new boolean[catValues.length];
+        mOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder mBuilder=new AlertDialog.Builder(MainActivity.this);
+                mBuilder.setTitle("Choose Category");
+                mBuilder.setMultiChoiceItems(catValues, checkedCat, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        if (isChecked) {
+                            if (!userSelectCat.contains(which)) {
+                                userSelectCat.add(which);
+
+                            } else {
+                                userSelectCat.remove(which);
+                            }
+                        }
+                    }
+                }).setCancelable(false).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        String item = "";
+                        for (int i = 0; i < userSelectCat.size(); i++) {
+                            if (i != userSelectCat.size() - 1)
+                                item = item + catValues[userSelectCat.get(i)] + ",";
+                            else
+                                item = item + catValues[userSelectCat.get(i)];
+
+                        }
+                        mSelectedItemss.setText(item);
+
+                    }
+                }).setNegativeButton("Dismiss", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+                mBuilder.setNeutralButton("Clear All", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        userSelectCat.clear();
+                        mSelectedItemss.setText("");
+                     for(int i=0;i<checkedCat.length;i++)
+                     {
+                         checkedCat[i]=false;
+
+                     }
+                    }
+                });
+                AlertDialog mDialog=mBuilder.create();
+                mDialog.show();
+
+            }
+        });
+
     }
 
     @Override
