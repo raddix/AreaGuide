@@ -8,13 +8,24 @@
     <string name="poisearch_hint">Kind of place to add to your route</string>
     <string name="no_search_results">No search results for \'%1$s\'. Please try another search term.</string>
     <string name="add_to_my_route">Add to my route</string>
+
     <string-array name="Categories">
-        <item>Shops</item>
-        <item>Museum</item>
-        <item>Resturants</item>
-        <item>Hospital</item>
-        <item>Brothel</item>
-        <item>Wakanda</item>
-        <item>Gspot</item>
+        <item>adventure sports venue</item>
+        <item>amusement park</item>
+        <item>aquatic zoo marine park</item>
+        <item>bar</item>
+        <item>barbecue</item>
+        <item>beach</item>
+        <item>buffet</item>
+        <item>cafeterias</item>
+        <item>casino</item>
+        <item>entertainment</item>
+        <item>important tourist attraction</item>
+        <item>natural attraction</item>
+        <item>restaurant</item>
+        <item>temple</item>
+        <item>zoo</item>
+        <item>wildlife park</item>
+        <item>shopping center</item>
     </string-array>
 </resources>
