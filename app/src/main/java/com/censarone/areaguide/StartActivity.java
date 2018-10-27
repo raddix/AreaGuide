@@ -40,7 +40,6 @@ public class StartActivity extends AppCompatActivity {
                 else
                 {
                     String[] selectedCategory = getSelectedCategory();
-                    System.out.println("The size of the selected cateogory is "+selectedCategory.length);
                     Intent intent = new Intent(StartActivity.this,MainActivity.class);
                     intent.putExtra("selectedCategory",selectedCategory);
                     startActivity(intent);
