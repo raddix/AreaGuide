@@ -14,15 +14,18 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.censarone.util.ConstantsUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StartActivity extends AppCompatActivity {
@@ -34,14 +37,20 @@ public class StartActivity extends AppCompatActivity {
 
     private View.OnClickListener checkBoxOnClick;
 
+    private List<CheckBox> checkBoxList = new ArrayList<>();
+
     private Map<Integer, String> categorySelectedMap = new HashMap<>();
     private double[] latLng = new double[2];
+
+    private ProgressBar progressBar;
 
     private LocationListener mLocationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
             latLng[0] = location.getLatitude();
             latLng[1] = location.getLongitude();
+            progressBar.setVisibility(View.GONE);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
             Toast.makeText(StartActivity.this, "We got the location", Toast.LENGTH_SHORT).show();
         }
 
@@ -69,6 +78,9 @@ public class StartActivity extends AppCompatActivity {
         initFields();
         addCheckBoxesIntoLayout();
         checkIfLocationEnabled();
+
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
         LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
@@ -153,6 +165,7 @@ public class StartActivity extends AppCompatActivity {
             cb.setOnClickListener(checkBoxOnClick);
             cb.setId(i);
             cb.setText(catValues[i].toUpperCase());
+            checkBoxList.add(cb);
             linearLayout.addView(cb);
         }
     }
@@ -161,6 +174,7 @@ public class StartActivity extends AppCompatActivity {
         linearLayout = findViewById(R.id.linear_layout);
         catValues = getResources().getStringArray(R.array.Categories);
         nextButton = findViewById(R.id.next_button);
+        progressBar = findViewById(R.id.start_progress_bar);
 
         checkBoxOnClick = new View.OnClickListener() {
             @Override
@@ -189,9 +203,15 @@ public class StartActivity extends AppCompatActivity {
         checkIfLocationEnabled();
     }
 
+    private void clearCheckBoxes() {
+        for(CheckBox cb : checkBoxList)
+            cb.setChecked(false);
+    }
+
     @Override
     protected void onRestart() {
         super.onRestart();
         checkIfLocationEnabled();
+        clearCheckBoxes();
     }
 }

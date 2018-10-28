@@ -3,6 +3,9 @@ package com.censarone.areaguide;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -47,7 +50,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements
+        OnMapReadyCallback,LoaderManager.LoaderCallbacks<List<FuzzySearchResult>> {
 
     private TomtomMap tomtomMap;
     private SearchApi searchApi;
@@ -79,6 +83,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         double[] latLng = getIntent().getExtras().getDoubleArray(ConstantsUtil.CURRENT_POSITION);
 
         currentPostion = new LatLng(latLng[0],latLng[1]);
+
+        //getLoaderManager().initLoader(0,null,null);
 
         searchForPlaces();
 
@@ -243,4 +249,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    @NonNull
+    @Override
+    public Loader<List<FuzzySearchResult>> onCreateLoader(int i, @Nullable Bundle bundle) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(@NonNull Loader<List<FuzzySearchResult>> loader, List<FuzzySearchResult> fuzzySearchResults) {
+        drawCompleteMap(fuzzySearchResults);
+    }
+
+    @Override
+    public void onLoaderReset(@NonNull Loader<List<FuzzySearchResult>> loader) {
+
+    }
 }
