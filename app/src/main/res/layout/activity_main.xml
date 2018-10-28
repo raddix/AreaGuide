@@ -7,46 +7,6 @@
     android:background="@android:color/white"
     tools:context="com.censarone.areaguide.MainActivity">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/layout_height_xlarge"
-        android:layout_marginRight="16dp"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/layout_bg"
-        android:paddingBottom="@dimen/spacing_small"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:orientation="horizontal"
-        android:elevation="4dp"
-        android:gravity="top">
-
-        <EditText
-            android:id="@+id/edittext_main_poisearch"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginStart="@dimen/spacing_small"
-            android:background="@android:color/transparent"
-            android:hint="@string/poisearch_hint"
-            android:imeOptions="actionSearch"
-            android:textSize="@dimen/text_size_normal"
-            android:gravity="center"
-            android:inputType="text" />
-
-        <ImageButton
-            android:id="@+id/btn_main_poisearch"
-            android:layout_width="64dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:layout_marginEnd="@dimen/spacing_small"
-            android:layout_marginRight="16dp"
-            android:layout_gravity="center"
-            android:adjustViewBounds="true"
-            android:background="@android:color/transparent"
-            android:src="@android:drawable/ic_menu_search" />
-
-    </LinearLayout>
 
     <fragment
     android:id="@+id/mapFragment"
@@ -54,24 +14,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/btbOrder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginStart="136dp"
-        android:layout_marginTop="144dp"
-        android:text="Select Categories" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="274dp"
-       />
 
 
 </RelativeLayout>

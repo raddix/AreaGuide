@@ -9,6 +9,11 @@
     <string name="no_search_results">No search results for \'%1$s\'. Please try another search term.</string>
     <string name="add_to_my_route">Add to my route</string>
 
+    <string name="gps_error">This app needed your location to work</string>
+    <string name="open_location_settings">Enable</string>
+    <string name="cancel">Cancel</string>
+    <string name="rate_this_place">Rate This Place</string>
+
     <string-array name="Categories">
         <item>adventure sports venue</item>
         <item>amusement park</item>

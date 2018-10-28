@@ -4,7 +4,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.censarone.areaguide"
-        minSdkVersion 23
+        minSdkVersion 24
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
@@ -26,8 +26,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.tomtom.online:sdk-maps:2.243'
-    implementation 'com.tomtom.online:sdk-routing:2.243'
     implementation 'com.tomtom.online:sdk-search:2.243'
     implementation 'com.tomtom.online:sdk-maps-ui-extensions:2.243'
     api("com.tomtom.online:sdk-search:2.+@aar")
+    api("com.tomtom.online:sdk-routing:2.+")
 }

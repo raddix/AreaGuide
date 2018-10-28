@@ -18,7 +18,7 @@
         android:paddingLeft="@dimen/spacing_small"
         android:paddingRight="@dimen/spacing_small"
         android:paddingTop="@dimen/spacing_xtiny"
-        android:text="@string/add_to_my_route"
+        android:text="@string/rate_this_place"
         android:textAlignment="center"
         android:textSize="@dimen/text_size_small"
         android:textStyle="bold"
