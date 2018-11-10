@@ -11,8 +11,10 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -28,7 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity implements LocationListener {
 
     private String[] catValues;
 
@@ -44,31 +46,13 @@ public class StartActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
 
-    private LocationListener mLocationListener = new LocationListener() {
-        @Override
-        public void onLocationChanged(Location location) {
-            latLng[0] = location.getLatitude();
-            latLng[1] = location.getLongitude();
-            progressBar.setVisibility(View.GONE);
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-            Toast.makeText(StartActivity.this, "We got the location", Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {
-
-        }
-
-        @Override
-        public void onProviderEnabled(String provider) {
-
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {
-
-        }
-    };
+    private void setCurrentLocation(Location location) {
+        latLng[0] = location.getLatitude();
+        latLng[1] = location.getLongitude();
+        progressBar.setVisibility(View.GONE);
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+        Toast.makeText(StartActivity.this, "We got the location", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,19 +63,17 @@ public class StartActivity extends AppCompatActivity {
         addCheckBoxesIntoLayout();
         checkIfLocationEnabled();
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
+        }
+
+        getCurrentLocation();
+
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                 WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
-        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        else
-        {
-            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 100L,
-                    100f, mLocationListener);
-        }
+
 
 
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -110,6 +92,20 @@ public class StartActivity extends AppCompatActivity {
             }
         });
 
+
+    }
+
+    private void getCurrentLocation() {
+        LocationManager mLocationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        try
+        {
+            mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 5, this);
+        }
+        catch (SecurityException e)
+        {
+            Log.i("Location Tag","User declined the location");
+            System.exit(0);
+        }
 
     }
 
@@ -213,5 +209,42 @@ public class StartActivity extends AppCompatActivity {
         super.onRestart();
         checkIfLocationEnabled();
         clearCheckBoxes();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        setCurrentLocation(location);
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 1: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getCurrentLocation();
+
+                } else {
+                    System.exit(0);
+                }
+            }
+        }
     }
 }

@@ -4,4 +4,5 @@ public class ConstantsUtil {
 
     public static final String SELECTED_CATEGORY= "selectedCategory";
     public static final String CURRENT_POSITION = "currentPosition";
+    public static final String MODEL_LIST = "modellist";
 }

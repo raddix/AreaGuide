@@ -1,11 +1,11 @@
 package com.censarone.areaguide;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.censarone.util.ConstantsUtil;
+import com.censarone.util.ItenaryModel;
 import com.tomtom.online.sdk.common.location.LatLng;
 import com.tomtom.online.sdk.common.location.LatLngAcc;
 import com.tomtom.online.sdk.map.BaseMarkerBalloon;
@@ -42,7 +43,9 @@ import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchResponse;
 import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchResult;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -51,7 +54,7 @@ import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements
-        OnMapReadyCallback,LoaderManager.LoaderCallbacks<List<FuzzySearchResult>> {
+        OnMapReadyCallback {
 
     private TomtomMap tomtomMap;
     private SearchApi searchApi;
@@ -67,6 +70,14 @@ public class MainActivity extends AppCompatActivity implements
     private int it = 0;
 
     public static final int STANDARD_RADIUS = 30 * 1000;
+
+    ArrayList<ItenaryModel> list = new ArrayList<>();
+    ArrayList<ItenaryModel> trueList = new ArrayList<>();
+
+    private Integer timeTaken;
+    private Integer count = 1;
+
+    private String totalTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,9 +95,20 @@ public class MainActivity extends AppCompatActivity implements
 
         currentPostion = new LatLng(latLng[0],latLng[1]);
 
-        //getLoaderManager().initLoader(0,null,null);
 
         searchForPlaces();
+
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.e("The size of the list ",trueList.size()+"");
+                Intent intent = new Intent(MainActivity.this,ShowDetailsActivity.class);
+                intent.putExtra(ConstantsUtil.MODEL_LIST,trueList);
+                startActivity(intent);
+            }
+        });
+
 
     }
 
@@ -110,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements
                             if(fuzzySearchResponse.getResults().size()>0)
                             {
                                 FuzzySearchResult result = fuzzySearchResponse.getResults().get(0);
+                                ItenaryModel model = new ItenaryModel(count,result.getPoi().getName());
+                                list.add(model);
+                                count++;
                                 resultList.add(result);
                             }
 
@@ -135,6 +160,10 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void drawCompleteMap(List<FuzzySearchResult> resultList) {
+
+
+
+        count = 0;
 
         FuzzySearchResult lastResult = resultList.get(resultList.size()-1);
         LatLng destination = lastResult.getPosition();
@@ -201,6 +230,11 @@ public class MainActivity extends AppCompatActivity implements
                     @Override
                     public void accept(RouteResponse routeResult) throws Exception {
                         for (FullRoute fullRoute : routeResult.getRoutes()) {
+                            Log.i("FullRoute",fullRoute.getSummary().toString());
+                            ItenaryModel model = list.get(count);
+                            model.setTimeTaken(fullRoute.getSummary().getTravelTimeInSeconds());
+                            trueList.add(model);
+                            count++;
                             route = tomtomMap.addRoute(new RouteBuilder(
                                     fullRoute.getCoordinates()).startIcon(departureIcon).endIcon(destinationIcon).isActive(true));
                         }
@@ -249,19 +283,6 @@ public class MainActivity extends AppCompatActivity implements
     }
 
 
-    @NonNull
-    @Override
-    public Loader<List<FuzzySearchResult>> onCreateLoader(int i, @Nullable Bundle bundle) {
-        return null;
-    }
 
-    @Override
-    public void onLoadFinished(@NonNull Loader<List<FuzzySearchResult>> loader, List<FuzzySearchResult> fuzzySearchResults) {
-        drawCompleteMap(fuzzySearchResults);
-    }
 
-    @Override
-    public void onLoaderReset(@NonNull Loader<List<FuzzySearchResult>> loader) {
-
-    }
 }
