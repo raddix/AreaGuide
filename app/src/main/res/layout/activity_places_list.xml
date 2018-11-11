@@ -2,12 +2,22 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
+    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
     tools:context="com.censarone.areaguide.PlacesListActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hello World"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:id="@+id/title_places"/>
+
     <ListView
+        android:layout_below="@+id/title_places"
         android:id="@+id/places_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"></ListView>

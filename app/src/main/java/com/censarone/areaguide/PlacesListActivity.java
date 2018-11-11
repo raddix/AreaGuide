@@ -1,5 +1,6 @@
 package com.censarone.areaguide;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +9,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.censarone.util.ConstantsUtil;
@@ -32,15 +34,23 @@ public class PlacesListActivity extends AppCompatActivity {
 
     private SearchApi searchApi;
 
-    private List<FuzzySearchResult> selectedPlace;
+    private List<FuzzySearchResult> selectedPlace = new ArrayList<>();
     private List<FuzzySearchResult> currentList;
     private List<String> currentPlaces = new ArrayList<>();
+
+    private ArrayList<ItenaryModel> modelList = new ArrayList<>();
 
     private ListView listView;
 
     private LatLng currentPostion;
 
+    private String[] selectedCateogory;
+
     public static final int STANDARD_RADIUS = 30 * 1000;
+
+    private Integer totalCount = 0;
+
+    private TextView titleTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,17 +58,20 @@ public class PlacesListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_places_list);
 
         listView = findViewById(R.id.places_list_view);
+        titleTextView = findViewById(R.id.title_places);
 
-        String[] selectedCateogory = getIntent().getExtras().getStringArray(ConstantsUtil.SELECTED_CATEGORY);
+        selectedCateogory = getIntent().getExtras().getStringArray(ConstantsUtil.SELECTED_CATEGORY);
         double[] latLng = getIntent().getExtras().getDoubleArray(ConstantsUtil.CURRENT_POSITION);
         currentPostion = new LatLng(latLng[0],latLng[1]);
 
         searchApi = OnlineSearchApi.create(this);
 
+        titleTextView.setText(selectedCateogory[0].toUpperCase());
         searchPlaces(selectedCateogory[0]);
     }
 
     private void searchPlaces(String input) {
+        totalCount++;
         final FuzzySearchQuery fuzz = FuzzySearchQueryBuilder.create(input)
                 .withPreciseness(new LatLngAcc(currentPostion, STANDARD_RADIUS))
                 .withTypeAhead(true)
@@ -103,7 +116,28 @@ public class PlacesListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 FuzzySearchResult result = currentList.get(i);
-                Toast.makeText(PlacesListActivity.this, "You clicked on "+result.getPoi(), Toast.LENGTH_SHORT).show();
+                ItenaryModel model = new ItenaryModel(totalCount,result.getPoi().getName());
+                modelList.add(model);
+
+                selectedPlace.add(result);
+                if(totalCount>=selectedCateogory.length) {
+                    ArrayList<FuzzySearchResult> completeList = new ArrayList<>();
+                    completeList.addAll(selectedPlace);
+                    Toast.makeText(PlacesListActivity.this, "First Step Completed !! YAY", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(PlacesListActivity.this,MainActivity.class);
+                    intent.putExtra(ConstantsUtil.CURRENT_POSITION,currentPostion);
+                    intent.putExtra("test",completeList);
+                    intent.putExtra("an",modelList);
+                    startActivity(intent);
+
+                    //intent.putExtra("test",selectedPlace);
+                }
+                else
+                {
+                    currentPlaces.clear();
+                    titleTextView.setText(selectedCateogory[totalCount].toUpperCase());
+                    searchPlaces(selectedCateogory[totalCount]);
+                }
             }
         });
     }

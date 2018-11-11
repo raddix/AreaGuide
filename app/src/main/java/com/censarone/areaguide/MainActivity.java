@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements
     private Icon destinationIcon;
 
     private LatLng currentPostion;
+    private ArrayList<FuzzySearchResult> mList;
 
     private String[] selectedCateogory;
 
@@ -91,15 +92,19 @@ public class MainActivity extends AppCompatActivity implements
         initTomTomServices();
         initUIViews();
 
-        selectedCateogory = getIntent().getExtras().getStringArray(ConstantsUtil.SELECTED_CATEGORY);
-        double[] latLng = getIntent().getExtras().getDoubleArray(ConstantsUtil.CURRENT_POSITION);
+        //selectedCateogory = getIntent().getExtras().getStringArray(ConstantsUtil.SELECTED_CATEGORY);
+        //double[] latLng = getIntent().getExtras().getDoubleArray(ConstantsUtil.CURRENT_POSITION);
 
-        currentPostion = new LatLng(latLng[0],latLng[1]);
+        //currentPostion = new LatLng(latLng[0],latLng[1]);
+
+        currentPostion = (LatLng) getIntent().getSerializableExtra(ConstantsUtil.CURRENT_POSITION);
+        mList = (ArrayList<FuzzySearchResult>) getIntent().getSerializableExtra("test");
+        list = (ArrayList<ItenaryModel>) getIntent().getSerializableExtra("an");
+
+        Toast.makeText(this, "Current Position "+currentPostion, Toast.LENGTH_SHORT).show();
 
 
-        searchForPlaces();
-
-
+        //searchForPlaces();
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -117,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    private void searchForPlaces() {
+    /*private void searchForPlaces() {
 
         final List<FuzzySearchResult> resultList = new ArrayList<>();
 
@@ -162,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements
 
 
 
-    }
+    }*/
 
     private void drawCompleteMap(List<FuzzySearchResult> resultList) {
         count = 0;
@@ -233,6 +238,7 @@ public class MainActivity extends AppCompatActivity implements
         this.tomtomMap.centerOnMyLocation();
         this.tomtomMap.getMarkerSettings().setMarkersClustering(true);
         this.tomtomMap.getMarkerSettings().setMarkerBalloonViewAdapter(createCustomViewAdapter());
+        drawCompleteMap(mList);
     }
 
 
