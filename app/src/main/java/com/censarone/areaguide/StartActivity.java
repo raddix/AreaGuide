@@ -84,7 +84,7 @@ public class StartActivity extends AppCompatActivity implements LocationListener
                 else
                 {
                     String[] selectedCategory = getSelectedCategory();
-                    Intent intent = new Intent(StartActivity.this,MainActivity.class);
+                    Intent intent = new Intent(StartActivity.this,PlacesListActivity.class);
                     intent.putExtra(ConstantsUtil.SELECTED_CATEGORY,selectedCategory);
                     intent.putExtra(ConstantsUtil.CURRENT_POSITION,latLng);
                     startActivity(intent);
