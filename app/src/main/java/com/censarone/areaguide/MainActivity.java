@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import com.censarone.util.ConstantsUtil;
 import com.censarone.util.ItenaryModel;
+import com.censarone.util.TimeFactor;
 import com.tomtom.online.sdk.common.location.LatLng;
 import com.tomtom.online.sdk.common.location.LatLngAcc;
 import com.tomtom.online.sdk.map.BaseMarkerBalloon;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements
     ArrayList<ItenaryModel> list = new ArrayList<>();
     ArrayList<ItenaryModel> trueList = new ArrayList<>();
 
-    private Integer timeTaken;
+    private Integer timeTaken = 0;
     private Integer count = 1;
 
     private String totalTime;
@@ -98,13 +99,17 @@ public class MainActivity extends AppCompatActivity implements
 
         searchForPlaces();
 
+
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Log.e("The size of the list ",trueList.size()+"");
+                totalTime = TimeFactor.convertTime(timeTaken);
                 Intent intent = new Intent(MainActivity.this,ShowDetailsActivity.class);
                 intent.putExtra(ConstantsUtil.MODEL_LIST,trueList);
+                intent.putExtra(ConstantsUtil.TIME_TAKEN,totalTime);
                 startActivity(intent);
             }
         });
@@ -160,10 +165,9 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void drawCompleteMap(List<FuzzySearchResult> resultList) {
-
-
-
         count = 0;
+
+        findTimeOfAllRoute(resultList);
 
         FuzzySearchResult lastResult = resultList.get(resultList.size()-1);
         LatLng destination = lastResult.getPosition();
@@ -180,6 +184,46 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         drawRouteWithWayPoints(currentPostion, destination, wayPoints);
+    }
+
+    private void findTimeOfAllRoute(List<FuzzySearchResult> resultList) {
+        LatLng start = currentPostion;
+
+        for(int i=0; i<resultList.size(); i++)
+        {
+            calculateRoute(start,resultList.get(i).getPosition());
+            start = resultList.get(i).getPosition();
+        }
+    }
+
+    private void calculateRoute(LatLng start, LatLng stop)
+    {
+        RouteQuery routeQuery = RouteQueryBuilder.create(start,stop)
+                .withComputeBestOrder(true)
+                .withConsiderTraffic(true).build();
+        System.out.println("Inside Caluculate Route");
+
+        Disposable subscribe = routingApi.planRoute(routeQuery).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<RouteResponse>() {
+                    @Override
+                    public void accept(RouteResponse routeResult) throws Exception {
+                        for (FullRoute fullRoute : routeResult.getRoutes()) {
+                            Log.i("FullRoute",fullRoute.getSummary().toString());
+                            ItenaryModel model = list.get(count);
+                            model.setTimeTaken(fullRoute.getSummary().getTravelTimeInSeconds());
+                            timeTaken+= fullRoute.getSummary().getTravelTimeInSeconds();
+                            Log.i("Time Updated","Now the time is "+timeTaken);
+                            trueList.add(model);
+                            count++;
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        throwable.printStackTrace();
+                    }
+                });
     }
 
     @Override
@@ -231,10 +275,6 @@ public class MainActivity extends AppCompatActivity implements
                     public void accept(RouteResponse routeResult) throws Exception {
                         for (FullRoute fullRoute : routeResult.getRoutes()) {
                             Log.i("FullRoute",fullRoute.getSummary().toString());
-                            ItenaryModel model = list.get(count);
-                            model.setTimeTaken(fullRoute.getSummary().getTravelTimeInSeconds());
-                            trueList.add(model);
-                            count++;
                             route = tomtomMap.addRoute(new RouteBuilder(
                                     fullRoute.getCoordinates()).startIcon(departureIcon).endIcon(destinationIcon).isActive(true));
                         }

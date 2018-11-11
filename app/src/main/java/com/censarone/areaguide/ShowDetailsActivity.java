@@ -25,6 +25,9 @@ public class ShowDetailsActivity extends AppCompatActivity {
         totalTimeTextView = findViewById(R.id.total_time_text_view);
 
         ArrayList<ItenaryModel> list = (ArrayList<ItenaryModel>) getIntent().getSerializableExtra(ConstantsUtil.MODEL_LIST);
+        String totalTime = getIntent().getStringExtra(ConstantsUtil.TIME_TAKEN);
+
+        totalTimeTextView.setText("Total Time Needed - "+totalTime);
 
         CustomAdapter ad = new CustomAdapter(list,ShowDetailsActivity.this);
         listView.setAdapter(ad);

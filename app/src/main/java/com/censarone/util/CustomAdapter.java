@@ -38,7 +38,7 @@ public class CustomAdapter extends ArrayAdapter<ItenaryModel> {
         id.setText(model.getId()+".");
 
         TextView desc = convertView.findViewById(R.id.content);
-        desc.setText(model.getDescription());
+        desc.setText(model.getDescription()+"-"+model.getTimeTaken());
 
         return convertView;
 

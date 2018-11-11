@@ -30,7 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity" />
-        <activity android:name=".ShowDetailsActivity"></activity>
+        <activity android:name=".ShowDetailsActivity" />
+        <activity android:name=".PlacesListActivity"></activity>
     </application>
 
 </manifest>
