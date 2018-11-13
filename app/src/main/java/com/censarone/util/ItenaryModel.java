@@ -6,18 +6,18 @@ public class ItenaryModel implements Serializable {
 
     private Integer id;
     private String description;
-    private Integer timeTaken;
+    private String timeTaken;
 
     public ItenaryModel(Integer id,String description) {
         this.id = id;
         this.description = description;
     }
 
-    public Integer getTimeTaken() {
+    public String getTimeTaken() {
         return timeTaken;
     }
 
-    public void setTimeTaken(Integer timeTaken) {
+    public void setTimeTaken(String timeTaken) {
         this.timeTaken = timeTaken;
     }
 

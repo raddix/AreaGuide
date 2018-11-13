@@ -51,7 +51,6 @@ public class StartActivity extends AppCompatActivity implements LocationListener
         latLng[1] = location.getLongitude();
         progressBar.setVisibility(View.GONE);
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
-        Toast.makeText(StartActivity.this, "We got the location", Toast.LENGTH_SHORT).show();
     }
 
     @Override

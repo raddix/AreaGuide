@@ -5,27 +5,27 @@ import java.util.Map;
 
 public class TimeFactor {
 
-    public static final Double ADVENTURE_SPORTS_VENUE=3.0;
-    public static final Double AMUSEMENT_PARK=3.0;
-    public static final Double AQUATIC_ZOO_MARINE_PARK=1.5;
-    public static final Double BAR=0.75;
-    public static final Double BARBEQUE=1.0;
-    public static final Double BEACH=2.0;
-    public static final Double BUFFET=1.5;
-    public static final Double CAFETERIA=0.5;
-    public static final Double CASINO=1.0;
-    public static final Double ENTERTAINMENT=1.0;
-    public static final Double IMPORTANT_TOURIST_ATTRACTION=1.5;
-    public static final Double NATURAL_ATTRACTION=1.0;
-    public static final Double RESTAURANT=0.75;
-    public static final Double TEMPLE=1.0;
-    public static final Double ZOO=1.0;
-    public static final Double WILDLIFE_PARK=2.0;
-    public static final Double SHOPPING_CENTER=1.5;
+    private static final Integer ADVENTURE_SPORTS_VENUE=10800;
+    private static final Integer AMUSEMENT_PARK=10800;
+    private static final Integer AQUATIC_ZOO_MARINE_PARK=5400;
+    private static final Integer BAR=2700;
+    private static final Integer BARBEQUE=3600;
+    private static final Integer BEACH=7200;
+    private static final Integer BUFFET=5400;
+    private static final Integer CAFETERIA=1800;
+    private static final Integer CASINO=3600;
+    private static final Integer ENTERTAINMENT=3600;
+    private static final Integer IMPORTANT_TOURIST_ATTRACTION=5400;
+    private static final Integer NATURAL_ATTRACTION=3600;
+    private static final Integer RESTAURANT=2700;
+    private static final Integer TEMPLE=3600;
+    private static final Integer ZOO=3600;
+    private static final Integer WILDLIFE_PARK=7200;
+    private static final Integer SHOPPING_CENTER=5400;
 
-    public static Map<String,Double> timeMap;
+    private static Map<String,Integer> timeMap;
 
-    public static Double getTimeFactor(String input)
+    public static Integer getTimeFactor(String input)
     {
         if(timeMap==null)
             inputValues();
@@ -34,7 +34,7 @@ public class TimeFactor {
         
     }
 
-    public static void inputValues() {
+    private static void inputValues() {
         timeMap = new HashMap<>();
         timeMap.put("adventure sports venue",ADVENTURE_SPORTS_VENUE);
         timeMap.put("amusement park",AMUSEMENT_PARK);
@@ -45,7 +45,7 @@ public class TimeFactor {
         timeMap.put("buffet",BUFFET);
         timeMap.put("cafeterias",CAFETERIA);
         timeMap.put("casino",CASINO);
-        timeMap.put("entertainment",AMUSEMENT_PARK);
+        timeMap.put("entertainment",ENTERTAINMENT);
         timeMap.put("important tourist attraction",IMPORTANT_TOURIST_ATTRACTION);
         timeMap.put("natural attraction",NATURAL_ATTRACTION);
         timeMap.put("restaurant",RESTAURANT);

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,6 @@ import com.censarone.util.ConstantsUtil;
 import com.censarone.util.ItenaryModel;
 import com.censarone.util.TimeFactor;
 import com.tomtom.online.sdk.common.location.LatLng;
-import com.tomtom.online.sdk.common.location.LatLngAcc;
 import com.tomtom.online.sdk.map.BaseMarkerBalloon;
 import com.tomtom.online.sdk.map.Icon;
 import com.tomtom.online.sdk.map.MapFragment;
@@ -36,29 +34,20 @@ import com.tomtom.online.sdk.routing.data.FullRoute;
 import com.tomtom.online.sdk.routing.data.RouteQuery;
 import com.tomtom.online.sdk.routing.data.RouteQueryBuilder;
 import com.tomtom.online.sdk.routing.data.RouteResponse;
-import com.tomtom.online.sdk.search.OnlineSearchApi;
-import com.tomtom.online.sdk.search.SearchApi;
-import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchQuery;
-import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchQueryBuilder;
-import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchResponse;
 import com.tomtom.online.sdk.search.data.fuzzy.FuzzySearchResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
-import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainActivity extends AppCompatActivity implements
         OnMapReadyCallback {
 
     private TomtomMap tomtomMap;
-    private SearchApi searchApi;
     private RoutingApi routingApi;
     private Route route;
     private Icon departureIcon;
@@ -69,15 +58,11 @@ public class MainActivity extends AppCompatActivity implements
 
     private String[] selectedCateogory;
 
-    private int it = 0;
-
-    public static final int STANDARD_RADIUS = 30 * 1000;
-
-    ArrayList<ItenaryModel> list = new ArrayList<>();
-    ArrayList<ItenaryModel> trueList = new ArrayList<>();
+    private ArrayList<ItenaryModel> list = new ArrayList<>();
+    private ArrayList<ItenaryModel> trueList = new ArrayList<>();
 
     private Integer timeTaken = 0;
-    private Integer count = 1;
+    private Integer count = 0;
 
     private String totalTime;
 
@@ -92,19 +77,11 @@ public class MainActivity extends AppCompatActivity implements
         initTomTomServices();
         initUIViews();
 
-        //selectedCateogory = getIntent().getExtras().getStringArray(ConstantsUtil.SELECTED_CATEGORY);
-        //double[] latLng = getIntent().getExtras().getDoubleArray(ConstantsUtil.CURRENT_POSITION);
-
-        //currentPostion = new LatLng(latLng[0],latLng[1]);
 
         currentPostion = (LatLng) getIntent().getSerializableExtra(ConstantsUtil.CURRENT_POSITION);
-        mList = (ArrayList<FuzzySearchResult>) getIntent().getSerializableExtra("test");
-        list = (ArrayList<ItenaryModel>) getIntent().getSerializableExtra("an");
-
-        Toast.makeText(this, "Current Position "+currentPostion, Toast.LENGTH_SHORT).show();
-
-
-        //searchForPlaces();
+        mList = (ArrayList<FuzzySearchResult>) getIntent().getSerializableExtra(ConstantsUtil.COMPLETE_LIST);
+        list = (ArrayList<ItenaryModel>) getIntent().getSerializableExtra(ConstantsUtil.MODEL_LIST);
+        selectedCateogory = getIntent().getStringArrayExtra(ConstantsUtil.SELECTED_CATEGORY);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -122,56 +99,8 @@ public class MainActivity extends AppCompatActivity implements
 
     }
 
-    /*private void searchForPlaces() {
-
-        final List<FuzzySearchResult> resultList = new ArrayList<>();
-
-        for(String s : selectedCateogory)
-        {
-            FuzzySearchQuery fuzz = FuzzySearchQueryBuilder.create(s)
-                    .withPreciseness(new LatLngAcc(currentPostion, STANDARD_RADIUS))
-                    .withTypeAhead(true)
-                    .withCategory(true).build();
-
-            searchApi.search(fuzz)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(new DisposableSingleObserver<FuzzySearchResponse>() {
-                        @Override
-                        public void onSuccess(FuzzySearchResponse fuzzySearchResponse) {
-                            if(fuzzySearchResponse.getResults().size()>0)
-                            {
-                                FuzzySearchResult result = fuzzySearchResponse.getResults().get(0);
-                                ItenaryModel model = new ItenaryModel(count,result.getPoi().getName());
-                                list.add(model);
-                                count++;
-                                resultList.add(result);
-                            }
-
-                            it++;
-                            if(it==(selectedCateogory.length))
-                                drawCompleteMap(resultList);
-
-                        }
-
-                        @Override
-                        public void onError(Throwable throwable) {
-                            it++;
-                            if(it==(selectedCateogory.length-1))
-                                drawCompleteMap(resultList);
-                            Log.e("ERROR", "Error in getting results "+throwable.getMessage());
-                        }
-                    });
-
-        }
-
-
-
-    }*/
 
     private void drawCompleteMap(List<FuzzySearchResult> resultList) {
-        count = 0;
-
         findTimeOfAllRoute(resultList);
 
         FuzzySearchResult lastResult = resultList.get(resultList.size()-1);
@@ -206,7 +135,6 @@ public class MainActivity extends AppCompatActivity implements
         RouteQuery routeQuery = RouteQueryBuilder.create(start,stop)
                 .withComputeBestOrder(true)
                 .withConsiderTraffic(true).build();
-        System.out.println("Inside Caluculate Route");
 
         Disposable subscribe = routingApi.planRoute(routeQuery).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -216,8 +144,9 @@ public class MainActivity extends AppCompatActivity implements
                         for (FullRoute fullRoute : routeResult.getRoutes()) {
                             Log.i("FullRoute",fullRoute.getSummary().toString());
                             ItenaryModel model = list.get(count);
-                            model.setTimeTaken(fullRoute.getSummary().getTravelTimeInSeconds());
-                            timeTaken+= fullRoute.getSummary().getTravelTimeInSeconds();
+                            Integer totalTime = TimeFactor.getTimeFactor(selectedCateogory[count].toLowerCase())+fullRoute.getSummary().getTravelTimeInSeconds();
+                            model.setTimeTaken(TimeFactor.convertTime(totalTime));
+                            timeTaken+= totalTime;
                             Log.i("Time Updated","Now the time is "+timeTaken);
                             trueList.add(model);
                             count++;
@@ -245,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements
     private void initTomTomServices() {
         MapFragment mapFragment = (MapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment);
         mapFragment.getAsyncMap(this);
-        searchApi = OnlineSearchApi.create(this);
         routingApi = OnlineRoutingApi.create(this);
     }
 

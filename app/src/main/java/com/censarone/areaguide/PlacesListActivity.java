@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -37,6 +38,7 @@ public class PlacesListActivity extends AppCompatActivity {
     private List<FuzzySearchResult> selectedPlace = new ArrayList<>();
     private List<FuzzySearchResult> currentList;
     private List<String> currentPlaces = new ArrayList<>();
+    private List<String> finalPlacesList = new ArrayList<>();
 
     private ArrayList<ItenaryModel> modelList = new ArrayList<>();
 
@@ -52,6 +54,22 @@ public class PlacesListActivity extends AppCompatActivity {
 
     private TextView titleTextView;
 
+    private Button submitButton;
+
+    private View.OnClickListener submitButtonOnClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            ArrayList<FuzzySearchResult> completeList = new ArrayList<>();
+            completeList.addAll(selectedPlace);
+            Intent intent = new Intent(PlacesListActivity.this,MainActivity.class);
+            intent.putExtra(ConstantsUtil.CURRENT_POSITION,currentPostion);
+            intent.putExtra(ConstantsUtil.COMPLETE_LIST,completeList);
+            intent.putExtra(ConstantsUtil.MODEL_LIST,modelList);
+            intent.putExtra(ConstantsUtil.SELECTED_CATEGORY,selectedCateogory);
+            startActivity(intent);
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,6 +77,9 @@ public class PlacesListActivity extends AppCompatActivity {
 
         listView = findViewById(R.id.places_list_view);
         titleTextView = findViewById(R.id.title_places);
+        submitButton = findViewById(R.id.submit_button);
+
+        submitButton.setOnClickListener(submitButtonOnClick);
 
         selectedCateogory = getIntent().getExtras().getStringArray(ConstantsUtil.SELECTED_CATEGORY);
         double[] latLng = getIntent().getExtras().getDoubleArray(ConstantsUtil.CURRENT_POSITION);
@@ -117,20 +138,19 @@ public class PlacesListActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 FuzzySearchResult result = currentList.get(i);
                 ItenaryModel model = new ItenaryModel(totalCount,result.getPoi().getName());
+                finalPlacesList.add(result.getPoi().getName());
                 modelList.add(model);
 
                 selectedPlace.add(result);
                 if(totalCount>=selectedCateogory.length) {
-                    ArrayList<FuzzySearchResult> completeList = new ArrayList<>();
-                    completeList.addAll(selectedPlace);
-                    Toast.makeText(PlacesListActivity.this, "First Step Completed !! YAY", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(PlacesListActivity.this,MainActivity.class);
-                    intent.putExtra(ConstantsUtil.CURRENT_POSITION,currentPostion);
-                    intent.putExtra("test",completeList);
-                    intent.putExtra("an",modelList);
-                    startActivity(intent);
+                    currentPlaces.clear();
+                    titleTextView.setText("Your final List");
+                    ArrayAdapter<String> finalAdapter = new ArrayAdapter<String>(PlacesListActivity.this,
+                            android.R.layout.simple_list_item_1, finalPlacesList);
 
-                    //intent.putExtra("test",selectedPlace);
+                    listView.setAdapter(finalAdapter);
+                    submitButton.setVisibility(View.VISIBLE);
+
                 }
                 else
                 {
